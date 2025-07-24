@@ -31,7 +31,7 @@ function fetchGradeData() {
             try {
                 const response = xhr.responseText;
 
-                if (!response) {
+                if (!response || response.trim() === "") {
                     console.error("Empty response received from server.");
                     return;
                 }
@@ -39,7 +39,7 @@ function fetchGradeData() {
                 const data = JSON.parse(response);
 
                 if (!Array.isArray(data)) {
-                    console.error("Expected an array of grade data, but got:", data);
+                    console.error("Expected array but got:", data);
                     return;
                 }
 
@@ -55,29 +55,27 @@ function fetchGradeData() {
     xhr.send();
 }
 function populateGradebook(data) {
+    if (!Array.isArray(data)) {
+        console.error("populateGradebook received invalid data:", data);
+        return;
+    }
+
     console.log("Populating gradebook with data:", data);
 
     let tableElm = document.getElementById("gradebook");
+    tableElm.innerHTML = "";
 
     data.forEach(function (assignment) {
         let row = document.createElement("tr");
 
-        // Create columns
         let nameCell = document.createElement("td");
-        nameCell.appendChild(
-            document.createTextNode(assignment.last_name + ", " + assignment.first_name)
-        );
+        nameCell.textContent = assignment.last_name + ", " + assignment.first_name;
 
         let gradeCell = document.createElement("td");
-        gradeCell.appendChild(
-            document.createTextNode(assignment.total_grade)
-        );
+        gradeCell.textContent = assignment.total_grade;
 
-        // Append columns to row
         row.appendChild(nameCell);
         row.appendChild(gradeCell);
-
-        // Append row to table
         tableElm.appendChild(row);
     });
 }
