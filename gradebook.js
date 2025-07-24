@@ -16,25 +16,56 @@ const gradeData = fetchGradeData();
 populateGradebook(gradeData);
 // END REMOVE
 function fetchGradeData() {
-    // This functin will query the PostgreSQL database and return grade data console.log("Fetching grade data...");
+    // This function will query the PostgreSQL database and return grade data
+    console.log("Fetching grade data...");
+
     // Create a new request for HTTP data
-    let xhr = new request XMLHttpRequest();
+    let xhr = new XMLHttpRequest();
+
     // This is the address on the machine we're asking for data
     let apiRoute = "/api/grades";
-    //When the request changes status, we run this anonymous function
-    xhr.onreadystatechange = function(){
-        let results;
-        //Check if we're done
-        if(xhr.readyState === xhr.DONE){
+
+    // When the request changes status, we run this anonymous function
+    xhr.onreadystatechange = function () {
+        // Check if we're done
+        if (xhr.readyState === XMLHttpRequest.DONE) {
             // Check if we're successful
-            if(xhr.status !== 200){
-                console.error('Could not get grades.
-                    Status: ${xhr.status}');
+            if (xhr.status !== 200) {
+                console.error(`Could not get grades. Status: ${xhr.status}`);
+                return;
             }
-            // And then call the function to update the HTML with out data
+            // Call the function to update the HTML with our data
             populateGradebook(JSON.parse(xhr.responseText));
-            }
-    }.bind(this);
-    xhr.open("get", apiRoute, true);
+        }
+    };
+
+    xhr.open("GET", apiRoute, true);
     xhr.send();
+}
+function populateGradebook(data) {
+    console.log("Populating gradebook with data:", data);
+
+    let tableElm = document.getElementById("gradebook");
+
+    data.forEach(function (assignment) {
+        let row = document.createElement("tr");
+
+        // Create columns
+        let nameCell = document.createElement("td");
+        nameCell.appendChild(
+            document.createTextNode(assignment.last_name + ", " + assignment.first_name)
+        );
+
+        let gradeCell = document.createElement("td");
+        gradeCell.appendChild(
+            document.createTextNode(assignment.total_grade)
+        );
+
+        // Append columns to row
+        row.appendChild(nameCell);
+        row.appendChild(gradeCell);
+
+        // Append row to table
+        tableElm.appendChild(row);
+    });
 }
