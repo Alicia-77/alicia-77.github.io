@@ -15,3 +15,26 @@ function populateGradebook(data) {
 const gradeData = fetchGradeData();
 populateGradebook(gradeData);
 // END REMOVE
+function fetchGradeData() {
+    // This functin will query the PostgreSQL database and return grade data console.log("Fetching grade data...");
+    // Create a new request for HTTP data
+    let xhr = new request XMLHttpRequest();
+    // This is the address on the machine we're asking for data
+    let apiRoute = "/api/grades";
+    //When the request changes status, we run this anonymous function
+    xhr.onreadystatechange = function(){
+        let results;
+        //Check if we're done
+        if(xhr.readyState === xhr.DONE){
+            // Check if we're successful
+            if(xhr.status !== 200){
+                console.error('Could not get grades.
+                    Status: ${xhr.status}');
+            }
+            // And then call the function to update the HTML with out data
+            populateGradebook(JSON.parse(xhr.responseText));
+            }
+    }.bind(this);
+    xhr.open("get", apiRoute, true);
+    xhr.send();
+}
