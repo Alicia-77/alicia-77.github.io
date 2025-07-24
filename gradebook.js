@@ -16,38 +16,26 @@ const gradeData = fetchGradeData();
 populateGradebook(gradeData);
 // END REMOVE
 function fetchGradeData() {
+    // This function will query the PostgreSQL database and return grade data
     console.log("Fetching grade data...");
 
+    // Create a new request for HTTP data
     let xhr = new XMLHttpRequest();
+
+    // This is the address on the machine we're asking for data
     let apiRoute = "/api/grades";
 
+    // When the request changes status, we run this anonymous function
     xhr.onreadystatechange = function () {
+        // Check if we're done
         if (xhr.readyState === XMLHttpRequest.DONE) {
+            // Check if we're successful
             if (xhr.status !== 200) {
                 console.error(`Could not get grades. Status: ${xhr.status}`);
                 return;
             }
-
-            try {
-                const response = xhr.responseText;
-
-                if (!response || response.trim() === "") {
-                    console.error("Empty response received from server.");
-                    return;
-                }
-
-                const data = JSON.parse(response);
-
-                if (!Array.isArray(data)) {
-                    console.error("Expected array but got:", data);
-                    return;
-                }
-
-                console.log("Data received:", data);
-                populateGradebook(data);
-            } catch (error) {
-                console.error("Error parsing grade data:", error);
-            }
+            // Call the function to update the HTML with our data
+            populateGradebook(JSON.parse(xhr.responseText));
         }
     };
 
@@ -55,27 +43,29 @@ function fetchGradeData() {
     xhr.send();
 }
 function populateGradebook(data) {
-    if (!Array.isArray(data)) {
-        console.error("populateGradebook received invalid data:", data);
-        return;
-    }
-
     console.log("Populating gradebook with data:", data);
 
     let tableElm = document.getElementById("gradebook");
-    tableElm.innerHTML = "";
 
     data.forEach(function (assignment) {
         let row = document.createElement("tr");
 
+        // Create columns
         let nameCell = document.createElement("td");
-        nameCell.textContent = assignment.last_name + ", " + assignment.first_name;
+        nameCell.appendChild(
+            document.createTextNode(assignment.last_name + ", " + assignment.first_name)
+        );
 
         let gradeCell = document.createElement("td");
-        gradeCell.textContent = assignment.total_grade;
+        gradeCell.appendChild(
+            document.createTextNode(assignment.total_grade)
+        );
 
+        // Append columns to row
         row.appendChild(nameCell);
         row.appendChild(gradeCell);
+
+        // Append row to table
         tableElm.appendChild(row);
     });
 }
